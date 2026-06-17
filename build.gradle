@@ -1,0 +1,75 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    implementation 'org.seleniumhq.selenium:selenium-java:4.26.0'
+    implementation 'org.testng:testng:7.11.0'
+
+    compileOnly 'org.projectlombok:lombok:1.18.46'
+    annotationProcessor 'org.projectlombok:lombok:1.18.46'
+    testCompileOnly 'org.projectlombok:lombok:1.18.46'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.46'
+
+    implementation 'net.datafaker:datafaker:2.5.2'
+    implementation 'ch.qos.logback:logback-classic:1.5.18'
+}
+
+test {
+    useTestNG()
+}
+
+
+tasks.register('qa', Test) {
+    useTestNG() {
+        suites 'src/test/resources/testng.xml'
+    }
+    if (project.hasProperty('browser')) {
+        systemProperty 'browser', "${browser}"
+    }
+}
+
+tasks.register('scope', Test) {
+    useTestNG() {
+        suites 'src/test/resources/scope.xml'
+    }
+    if (project.hasProperty('browser')) {
+        systemProperty 'browser', "${browser}"
+    }
+}
+
+tasks.register('groups', Test) {
+    useTestNG() {
+        def groups = System.getProperty('groups')
+        if(groups != null){
+            includeGroups groups
+        }
+        suites 'src/test/resources/base.xml'
+    }
+}
+
+tasks.register('qa1', Test) {
+    useTestNG() {
+        def suite = System.getProperty('suite', '')
+        if (suite.equals('login_registration')) {
+            suites 'src/test/resources/testng.xml'
+        } else if (suite.equals('add_contact')) {
+            suites 'src/test/resources/add_contact.xml'
+        } else {
+            suites 'src/test/resources/testng.xml'
+        }
+    }
+    if (project.hasProperty('browser')) {
+        systemProperty 'browser', "${browser}"
+    }
+}
+
+
